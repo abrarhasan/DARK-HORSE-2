@@ -12,7 +12,7 @@ module.exports = {
     name: "anicdp",
     aliases: ["animecdp"],
     version: "1.7",
-    author: "MahMUD",
+    author: "ABRAR",
     countDown: 5,
     role: 0,
     category: "media",
