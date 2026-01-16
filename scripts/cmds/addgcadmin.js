@@ -3,7 +3,7 @@ module.exports = {
     name: "gcadmin",
     aliases: ['groupadmin', 'admingc', 'admingroup'],
     version: "1.5",
-    author: "Asif",
+    author: "ABRAR",
     countDown: 5,
     role: 1,
     shortDescription: "Manage group admins",
@@ -35,7 +35,7 @@ async function addAdmin(api, event, tID, target) {
     await api.changeAdminStatus(tID, uID, true);
     api.sendMessage(`✅ User ${name} promoted to admin.`, tID);
   } catch {
-    api.sendMessage("- এডমিন দে আগে মগা..!😾", tID);
+    api.sendMessage("- Please make me admin at first to make him or her an admin..!😾", tID);
   }
 }
 
