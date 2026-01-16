@@ -28,7 +28,7 @@ module.exports = {
   config: {
     name: "needgf",
     version: "3.0.1",
-    author: "MOHAMMAD AKASH",
+    author: "abrar",
     countDown: 10,
     role: 0,
     shortDescription: "তোর Gf এর প্রোফাইল পিক দেখায় 😍",
@@ -46,12 +46,12 @@ module.exports = {
       const imgUrl = res.data?.data?.url;
 
       if (!imgUrl)
-        return message.reply("⚠️ ছবি পাওয়া যায়নি ভাই 😭 আবার চেষ্টা করো!");
+        return message.reply("⚠️ I could not find ur GF😭 Please try again!");
 
       const imgPath = path.join(__dirname, "tmp", `${event.senderID}_gf.jpg`);
       await downloadImage(imgUrl, imgPath);
 
-      const replyMsg = `🌸✨ আপনার ভাগ্য জেগেছে ভাই!\nএমন সুন্দরী গফ সবাই পায় না 💕\n👇 নিচে দেখুন আপনার গফের প্রোফাইল 😚`;
+      const replyMsg = `🌸✨ You are lucky man!\n Everyone doesnt deserve such a beautiful girl💕\n👇Here is your cutie😚`;
 
       await message.reply({
         body: replyMsg,
@@ -62,7 +62,7 @@ module.exports = {
 
     } catch (err) {
       console.error("❌ Error:", err.message);
-      message.reply("⚠️ কিছু একটা গন্ডগোল হইছে ভাই 😭 পরে আবার চেষ্টা করো!");
+      message.reply("⚠️ Something went wrong😭 Try again later!");
     }
   }
 };
