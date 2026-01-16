@@ -8,7 +8,7 @@ module.exports = {
     version: "1.0",
     author: "Sandy",
     countDown: 5,
-    role: 1,
+    role: 2,
     shortDescription: "bot will leave gc",
     longDescription: "",
     category: "owner",
