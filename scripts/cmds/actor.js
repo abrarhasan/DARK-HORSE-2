@@ -15,7 +15,7 @@ module.exports = {
     name: "actor",
     aliases: ["actorgame"],
     version: "1.7",
-    author: "MahMUD",
+    author: "ABRAR",
     countDown: 10,
     role: 0,
     category: "game",
