@@ -21,7 +21,7 @@ module.exports = {
 
     const textAudioMap = {
       "i love you": "https://files.catbox.moe/npy7kl.mp3",
-      "matha beta": "https://files.catbox.moe/5rdtc6.mp3",
+      "headache": "https://files.catbox.moe/5rdtc6.mp3",
     };
 
     const key = body.trim().toLowerCase();
