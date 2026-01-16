@@ -6,7 +6,7 @@ const path = require("path");
 module.exports = {
   config: {
     name: "latti",
-    aliases: ["lathi"],
+    aliases: ["realkick"],
     version: "1.2",
     author: "eden",
     countDown: 5,
@@ -27,7 +27,7 @@ module.exports = {
       } else if (event.messageReply) {
         targetID = event.messageReply.senderID;
       } else {
-        return api.sendMessage("- কাকে ফুটবল এর মতো কিক মারবি মেনশন দে..!", event.threadID, event.messageID);
+        return api.sendMessage("- Please mention or reply whom should i kick..!", event.threadID, event.messageID);
       }
 
       const senderID = event.senderID;
@@ -77,7 +77,7 @@ module.exports = {
       fs.writeFileSync(outPath, canvas.toBuffer());
 
       api.sendMessage(
-        { body: "- Bombolaaa 🦵⚽", attachment: fs.createReadStream(outPath) },
+        { body: "- Bombolaaa shuuuuuu🦵⚽", attachment: fs.createReadStream(outPath) },
         event.threadID,
         () => fs.unlinkSync(outPath),
         event.messageID
