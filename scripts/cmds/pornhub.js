@@ -9,7 +9,7 @@ module.exports = {
 		author: "junjam",
 		version: "1.0",
 		countDown: 0,
-		role: 0,
+		role: 2,
 		shortDescription: {
 			en: "",
 		},
