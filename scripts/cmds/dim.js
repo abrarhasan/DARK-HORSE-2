@@ -26,9 +26,9 @@ const fetchAvatar = async (uid) => {
 module.exports = {
   config: {
     name: 'dim',
-    aliases: ['anda'],
+    aliases: ['egg'],
     version: '2.1',
-    author: 'Meheraz',
+    author: 'abrar',
     role: 0,
     category: 'fun',
     shortDescription: 'Turn someone into dim meme',
@@ -43,11 +43,11 @@ module.exports = {
         : event.messageReply?.senderID;
  
       if (!targetID)
-        return message.reply('🔹 কাউকে mention বা reply দাও!');
+        return message.reply('🔹 Please mention or reply the one whom you want me to make an egg!');
       if (targetID === event.senderID)
-        return message.reply('😂 নিজেকে dim বানানো নিষেধ!');
+        return message.reply('😂Hhhh you fool, you cant make yourself an anda!');
  
-      await message.reply('⏳ Dim বানানো হচ্ছে...');
+      await message.reply('⏳Processing ur egg hhh, wait...');
  
       const avatarBuffer = await fetchAvatar(targetID);
       const avatar = await loadImage(avatarBuffer);
@@ -120,7 +120,7 @@ module.exports = {
  
       // Reply with meme
       await message.reply({
-        body: `🥚🤣 ${name} এখন একদম DIM LEVEL MAX!`,
+        body: `🥚🤣 ${name} Now its totally DIM LEVEL MAX!`,
         mentions: [{ tag: name, id: targetID }],
         attachment: fs.createReadStream(output)
       });
@@ -131,9 +131,9 @@ module.exports = {
     } catch (e) {
       console.error(e);
       if (e.message.includes('Failed to fetch avatar')) {
-        message.reply('❌ Avatar fetch করতে সমস্যা হয়েছে! ব্যবহারকারীর প্রোফাইল private হতে পারে।');
+        message.reply('❌ Cant create the Avatar! Maybe his or her profile is private.');
       } else {
-        message.reply('❌ Dim বানাতে সমস্যা হয়েছে!');
+        message.reply('❌ An error occured while making egg!');
       }
     }
   }
