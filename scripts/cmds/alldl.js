@@ -118,7 +118,7 @@ module.exports = {
 
             try {
               await message.send({
-                body: `✅ Here's your downloaded ${t}\n🛠️ Platform: ${platform}`,
+                body: `✅ Here's your downloaded video by ABRAR BOT ${t}\n🛠️ Platform: ${platform}`,
                 attachment: fs.createReadStream(filePath)
               });
               success = true;
