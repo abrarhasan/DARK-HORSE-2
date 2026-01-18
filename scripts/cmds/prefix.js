@@ -108,9 +108,10 @@ module.exports = {
           "╔══『 𝐏𝐑𝐄𝐅𝐈𝐗 』══╗\n"
         + `║ 🌍 System : ${globalPrefix}\n`
         + `║ 💬 Chatbox : ${threadPrefix}\n`
-        + `║ ➤ ${threadPrefix}help to see all available cmds 🥵\n`
+        + `║ ➤ Send ${threadPrefix}help to see all available cmds 🥵\n`
+        + `║ ➤ OWNER: ABRAR HASAN. ID:https://www.facebook.com/abrar.hasan.125760550\n`
         + "╚═══════════════╝",
-        attachment: await utils.getStreamFromURL("https://files.catbox.moe/ykk54z.jpg")
+        attachment: await utils.getStreamFromURL("https://files.catbox.moe/gjhpab.jpg")
       });
     }
   }
