@@ -1,4 +1,5 @@
-  config: {
+@@ -4,7 +4,7 @@ module.exports = {
+config: {
     name: "info",
     version: "2.5.3",
     author: "ST | Sheikh Tamim",
