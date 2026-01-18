@@ -109,7 +109,7 @@ module.exports = {
         + `║ 🌍 System : ${globalPrefix}\n`
         + `║ 💬 Chatbox : ${threadPrefix}\n`
         + `║ ➤ Send ${threadPrefix}help to see all available cmds 🥵\n`
-        + `║ ➤ OWNER: ABRAR HASAN. ID:https://www.facebook.com/abrar.hasan.125760550\n`
+        + `║ ➤ OWNER: ABRAR HASAN. ID: https://www.facebook.com/abrar.hasan.125760550\n`
         + "╚═══════════════╝",
         attachment: await utils.getStreamFromURL("https://files.catbox.moe/gjhpab.jpg")
       });
