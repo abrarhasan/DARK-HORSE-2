@@ -48,7 +48,7 @@ module.exports = {
 
       try {
         await api.sendMessage(
-          `✓ Group Approved\n\n📜 Type ${global.GoatBot.config.prefix}help to See Cmds!`,
+          `✓The Group Has Been Approved by Owner ABRAR HASAN.\n\n For any help, contact Owner: https://www.facebook.com/abrar.hasan.125760550 \n\n📜 Type ${global.GoatBot.config.prefix}help to See Cmds!`,
           group.threadID
         );
 
