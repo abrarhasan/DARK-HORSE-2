@@ -114,8 +114,8 @@ module.exports = {
       msg += `\n━━━━━━━━━━━━━━\n`;
       msg += `🔢 Total Commands: ${total}\n`;
       msg += `⚡ Prefix: ${prefix}\n`;
-      msg += `👑 Owner: ABRAR HASAN`;
-
+      msg += `👑 Owner: ABRAR HASAN\n`;
+      msg += `👑 Owner account: https://www.facebook.com/abrar.hasan.125760550`;
       return message.reply(msg);
     }
 
