@@ -5,7 +5,7 @@ module.exports = {
     name: "uptime",
     aliases: ["up", "upt"],
     version: "5.1",
-    author: "Alamin",
+    author: "ABRAR",
     role: 0,
     shortDescription: "Show bot uptime with moon phase animation",
     longDescription: "Displays bot uptime stats in stylish moon-phase animation format with total users and threads.",
@@ -82,7 +82,7 @@ module.exports = {
 💻 ᴍᴇᴍᴏʀʏ : ${memoryUsage} MB
 👥 ᴛᴏᴛᴀʟ ᴜꜱᴇʀꜱ : ${totalUsers}
 💬 ᴛᴏᴛᴀʟ ᴛʜʀᴇᴀᴅꜱ : ${totalThreads}
-👑 ᴏᴡɴᴇʀ  : Mohammad Alamin
+👑 ᴏᴡɴᴇʀ  : ABRAR HASAN
       `.trim();
 
       await delay(300);
