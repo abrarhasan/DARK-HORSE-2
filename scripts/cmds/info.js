@@ -1,8 +1,8 @@
 @@ -4,7 +4,7 @@ module.exports = {
-config: {
+  config: {
     name: "info",
     version: "2.5.3",
-    author: "ST | Sheikh Tamim",
+    author: "ABRAR",
     role: 0,
     countDown: 20,
     shortDescription: {
@@ -20,8 +20,8 @@ config: {
 @@ -34,7 +34,7 @@ module.exports = {
     const totalCommands = global.GoatBot?.commands?.size || 0;
 
-    const images = ["https://i.imgur.com/L5fGnYX.jpeg","https://i.imgur.com/mAifBNb.jpeg","https://i.imgur.com/Lf028tD.jpeg","https://i.imgur.com/CdzNRud.jpeg"
-     
+    const images = [
+      "https://i.ibb.co/W4Nzpc8K/image0.png"
     ];
     const image = images[Math.floor(Math.random() * images.length)];
 
