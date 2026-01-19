@@ -61,4 +61,4 @@ module.exports = {
       attachment: await global.utils.getStreamFromURL(image)
     });
   }
- 
+ };
