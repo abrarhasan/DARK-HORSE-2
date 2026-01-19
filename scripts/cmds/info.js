@@ -1,4 +1,5 @@
-@@ -4,7 +4,7 @@ module.exports = {
+const moment = require("moment-timezone");
+module.exports = {
   config: {
     name: "info",
     version: "2.5.3",
@@ -6,29 +7,42 @@
     role: 0,
     countDown: 20,
     shortDescription: {
-@@ -21,10 +21,10 @@ module.exports = {
-
-  onStart: async function ({ message }) {
-
+      en: "Owner & bot information"
+    },
+    longDescription: {
+      en: "Show detailed information about the bot, owner, uptime and socials"
+    },
+    category: "owner",
+    guide: {
+      en: "{pn}"
+    }
+  },
+ onStart: async function ({ message }) {
     const ownerName = "ABRAR HASAN";
     const ownerAge = "22";
     const ownerFB = "https://www.facebook.com/abrar.hasan.125760550";
     const ownerNumber = "+88018XXXXXXX";
     const status = "Active";
-
     const botName = global.GoatBot?.config?.nickNameBot || "GoatBot";
-@@ -34,7 +34,7 @@ module.exports = {
+    const prefix = global.GoatBot?.config?.prefix || "/";
+    // 🧠 TOTAL COMMANDS
     const totalCommands = global.GoatBot?.commands?.size || 0;
-
     const images = [
-      "https://i.ibb.co/W4Nzpc8K/image0.png"
+      "https://i.ibb.co/xqNbSRhr/image0.jpg","https://i.ibb.co/W4Nzpc8K/image0.png"
     ];
     const image = images[Math.floor(Math.random() * images.length)];
-
-@@ -53,18 +53,18 @@ module.exports = {
+    const now = moment().tz("Asia/Dhaka");
+    const date = now.format("MMMM Do YYYY");
+    const time = now.format("h:mm:ss A");
+    const uptime = process.uptime();
+    const days = Math.floor(uptime / 86400);
+    const hours = Math.floor((uptime % 86400) / 3600);
+    const minutes = Math.floor((uptime % 3600) / 60);
+    const seconds = Math.floor(uptime % 60);
+    const uptimeString = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+    return message.reply({
       body: `
 ╔═《 ✨ 𝗢𝗪𝗡𝗘𝗥 & 𝗕𝗢𝗧 𝗜𝗡𝗙𝗢 ✨ 》═╗
-
 ⭓ 🤖 𝗕𝗼𝘁 𝗡𝗮𝗺𝗲   : 『 ${botName} 』
 ⭓ ☄️ 𝗣𝗿𝗲𝗳𝗶𝘅      : 『 ${prefix} 』
 ⭓ 🧠 𝗖𝗼𝗺𝗺𝗮𝗻𝗱𝘀    : 『 ${totalCommands} 』
@@ -43,3 +57,8 @@
 ⭓ 🌐 𝗙𝗮𝗰𝗲𝗯𝗼𝗼𝗸  : 『 ${ownerFB} 』
 
 ╚══════════════════════════╝
+`,
+      attachment: await global.utils.getStreamFromURL(image)
+    });
+  }
+ 
