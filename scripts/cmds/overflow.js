@@ -9,7 +9,7 @@ module.exports = {
     role: 2,
     shortDescription: "Watch overflow",
     longDescription: "List all episodes and play selected one",
-    category: "18+",
+    category: "HAHAHAHA+",
     guide: "{pn} => Show all episodes"
   },
 
