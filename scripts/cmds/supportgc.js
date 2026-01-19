@@ -4,7 +4,7 @@ module.exports = {
     version: "1.1",
     author: "Shikaki",
     countDown: 5,
-    role: 0,
+    role: 2,
     shortDescription: {
       en: "Join the support group chat"
     },
