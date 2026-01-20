@@ -11,7 +11,7 @@ module.exports = {
 				},
 				category: "BOX CHAT",
 				countDown: 15,
-				role: 1,
+				role: 2,
 				author: "Cliff"
 		},
 
