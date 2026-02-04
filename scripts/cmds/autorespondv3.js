@@ -1,4 +1,4 @@
-module.exports = {
+module.exports = 
 config: {
 name: "autorespondv3",
 version: "2.0.0",
