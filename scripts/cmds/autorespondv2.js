@@ -26,6 +26,7 @@ const emojis = {
 "⏳": ["prodia", "sdxl", "bardv3", "tanongv2", "+imagine", "genimg", "Tanongv4", "kamla", "+shortcut", "play", "wait", "sing", "anime", "animefy", "ani", "slap", "Pinterest", "what's", "why"],
 "🔍": ["search", "youtube", "music","history", "wiki", "google"],
 "🌊": ["ok", "cool", "bien", "super", "d'accord", "génial", "merveille"],
+"💜": ["abrar", "abrar hasan", "good boy"],
 };
 
 // Replies to specific words
