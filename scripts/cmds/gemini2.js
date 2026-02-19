@@ -1,62 +1,79 @@
-const axios = require("axios");
-const baseApiUrl = async () => {
-  const base = await axios.get(
-    `https://raw.githubusercontent.com/Mostakim0978/D1PT0/refs/heads/main/baseApiUrl.json`,
-  );
-  return base.data.api;
-};
+const a = require("axios");
+const nix = "https://raw.githubusercontent.com/aryannix/stuffs/master/raw/apis.json";
 
 module.exports = {
   config: {
-    name: "gemini2",
-    version: "1.0",
-    author: "Dipto",
-    description: "gemeini ai",
-    countDown: 5,
+    name: "gemini",
+    aliases: ["ai2","chat"],
+    version: "0.0.1",
+    author: "ArYAN",
+    countDown: 3,
     role: 0,
-    category: "google",
-    guide: {
-      en: "{pn} message | photo reply",
-    },
+    shortDescription: "Ask Gemini AI",
+    longDescription: "Talk with Gemini AI using Aryan's updated API",
+    category: "AI",
+    guide: "+gemini2 [your question]"
   },
-  onStart: async ({ api, args, event }) => {
-    const prompt = args.join(" ");
-    //---- Image Reply -----//
-    if (event.type === "message_reply") {
-      var t = event.messageReply.attachments[0].url;
-      try {
-        const response = await axios.get(
-          `${await baseApiUrl()}/gemini?prompt=${encodeURIComponent(prompt)}&url=${encodeURIComponent(t)}`,
-        );
-        const data2 = response.data.dipto;
-        api.sendMessage(data2, event.threadID, event.messageID);
-      } catch (error) {
-        console.error("Error:", error.message);
-        api.sendMessage(error, event.threadID, event.messageID);
-      }
+
+  onStart: async function({ api, event, args }) {
+    let e;
+    try {
+      const apiConfig = await a.get(nix);
+      e = apiConfig.data && apiConfig.data.api;
+      if (!e) throw new Error("Configuration Error: Missing API in GitHub JSON.");
+    } catch (error) {
+      api.sendMessage("❌ Failed to fetch API configuration from GitHub.", event.threadID, event.messageID);
+      return;
     }
-    //---------- Message Reply ---------//
-    else if (!prompt) {
-      return api.sendMessage(
-        "Please provide a prompt or message reply",
-        event.threadID,
-        event.messageID,
-      );
-    } else {
-      try {
-        const respons = await axios.get(
-          `${await baseApiUrl()}/gemini?prompt=${encodeURIComponent(prompt)}`,
-        );
-        const message = respons.data.dipto;
-        api.sendMessage(message, event.threadID, event.messageID);
-      } catch (error) {
-        console.error("Error calling Gemini AI:", error);
-        api.sendMessage(
-          `Sorry, there was an error processing your request.${error}`,
-          event.threadID,
-          event.messageID,
-        );
-      }
+
+    const p = args.join(" ");
+    if (!p) return api.sendMessage("❌ Please provide a question or prompt.", event.threadID, event.messageID);
+
+    api.setMessageReaction("⏳", event.messageID, () => {}, true);
+
+    try {
+      const r = await a.get(`${e}/gemini?prompt=${encodeURIComponent(p)}`);
+      const reply = r.data?.response; 
+      if (!reply) throw new Error("No response from Gemini API.");
+
+      api.setMessageReaction("✅", event.messageID, () => {}, true);
+
+      api.sendMessage(reply, event.threadID, (err, i) => {
+        if (!i) return;
+        global.GoatBot.onReply.set(i.messageID, { commandName: this.config.name, author: event.senderID, baseApi: e });
+      }, event.messageID);
+
+    } catch (error) {
+      api.setMessageReaction("❌", event.messageID, () => {}, true);
+      api.sendMessage("⚠ Gemini API theke response pawa jachchhe na.", event.threadID, event.messageID);
     }
   },
+
+  onReply: async function({ api, event, Reply }) {
+    if ([api.getCurrentUserID()].includes(event.senderID)) return;
+    const { baseApi: e } = Reply;
+    if (!e) return api.sendMessage("❌ Session expired. Please start a new conversation.", event.threadID, event.messageID);
+
+    const p = event.body;
+    if (!p) return;
+
+    api.setMessageReaction("⏳", event.messageID, () => {}, true);
+
+    try {
+      const r = await a.get(`${e}/gemini?prompt=${encodeURIComponent(p)}`);
+      const reply = r.data?.response; 
+      if (!reply) throw new Error("No response from Gemini API.");
+
+      api.setMessageReaction("✅", event.messageID, () => {}, true);
+
+      api.sendMessage(reply, event.threadID, (err, i) => {
+        if (!i) return;
+        global.GoatBot.onReply.set(i.messageID, { commandName: this.config.name, author: event.senderID, baseApi: e });
+      }, event.messageID);
+
+    } catch (error) {
+      api.setMessageReaction("❌", event.messageID, () => {}, true);
+      api.sendMessage("⚠ Gemini API er response dite somossa hocchhe.", event.threadID, event.messageID);
+    }
+  }
 };
