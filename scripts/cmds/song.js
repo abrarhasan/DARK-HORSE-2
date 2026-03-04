@@ -1,83 +1,149 @@
-const axios = require('axios');
-const fs = require('fs');
-const path = require('path');
+const axios = require("axios");
+const fs = require("fs");
+const path = require("path");
+const ytSearch = require("yt-search");
+const https = require("https");
 
+/* ================= AUTO DELETE FILE ================= */
+function deleteAfterTimeout(filePath, timeout = 15000) {
+  setTimeout(() => {
+    if (fs.existsSync(filePath)) {
+      fs.unlink(filePath, (err) => {
+        if (!err) console.log(`✅ Deleted: ${filePath}`);
+        else console.error(`❌ Delete error: ${filePath}`);
+      });
+    }
+  }, timeout);
+}
+
+/* ================= COMMAND ================= */
 module.exports = {
   config: {
-    name: 'song',
-    author: 'Nyx',
-    usePrefix: false,
-    category: 'Youtube Song Downloader'
+    name: "song",
+    aliases: ["music"],
+    version: "4.1.0",
+    prefix: false,
+    author: "MR᭄﹅ MAHABUB﹅ メꪜ",
+    countDown: 5,
+    role: 0,
+    shortDescription: "Download MP3 using YouTube search",
+    longDescription: "Search YouTube then download audio via Mahabub API",
+    category: "media",
+    guide: "{p}{n} <song name>",
   },
-  onStart: async ({ event, api, args, message }) => {
-    try {
-      const query = args.join(' ');
-      if (!query) return message.reply('Please provide a search query!');
-      
-      const searchResponse = await axios.get(`https://mostakim.onrender.com/mostakim/ytSearch?search=${encodeURIComponent(query)}`);
-      api.setMessageReaction("⏳", event.messageID, () => {}, true);
 
-      const parseDuration = (timestamp) => {
-        const parts = timestamp.split(':').map(part => parseInt(part));
-        let seconds = 0;
-
-        if (parts.length === 3) {
-          seconds = parts[0] * 3600 + parts[1] * 60 + parts[2];
-        } else if (parts.length === 2) {
-          seconds = parts[0] * 60 + parts[1];
-        }
-
-        return seconds;
-      };
-
-      const filteredVideos = searchResponse.data.filter(video => {
-        try {
-          const totalSeconds = parseDuration(video.timestamp);
-          return totalSeconds < 600;
-        } catch {
-          return false;
-        }
-      });
-
-      if (filteredVideos.length === 0) {
-        return message.reply('No short videos found (under 10 minutes)!');
-      }
-
-      const selectedVideo = filteredVideos[0];
-      const tempFilePath = path.join(__dirname, 'temp_audio.m4a');
-      const apiResponse = await axios.get(`https://mostakim.onrender.com/m/sing?url=${selectedVideo.url}`);
-      
-      if (!apiResponse.data.url) {
-        throw new Error('No audio URL found in response');
-      }
-
-      const writer = fs.createWriteStream(tempFilePath);
-      const audioResponse = await axios({
-        url: apiResponse.data.url,
-        method: 'GET',
-        responseType: 'stream'
-      });
-
-      audioResponse.data.pipe(writer);
-      
-      await new Promise((resolve, reject) => {
-        writer.on('finish', resolve);
-        writer.on('error', reject);
-      });
-
-      api.setMessageReaction("✅", event.messageID, () => {}, true);
-
-      await message.reply({
-        body: `🎧 Now playing: ${selectedVideo.title}\nDuration: ${selectedVideo.timestamp}`,
-        attachment: fs.createReadStream(tempFilePath)
-      });
-
-      fs.unlink(tempFilePath, (err) => {
-        if (err) message.reply(`Error deleting temp file: ${err.message}`);
-      });
-
-    } catch (error) {
-      message.reply(`Error: ${error.message}`);
+  onStart: async function ({ api, event, args }) {
+    if (!args.length) {
+      return api.sendMessage(
+        "» Upps 😾 write the song name!",
+        event.threadID,
+        event.messageID
+      );
     }
-  }
+
+    const songName = args.join(" ");
+    let searchMsg;
+
+    try {
+      /* 🔍 Searching message */
+      searchMsg = await api.sendMessage(
+        `🔍 Searching for "${songName}"...`,
+        event.threadID
+      );
+
+      /* 🔎 YouTube search */
+      const result = await ytSearch(songName);
+      if (!result.videos || result.videos.length === 0) {
+        throw new Error("No YouTube results found");
+      }
+
+      const top = result.videos[0];
+      const ytUrl = `https://youtu.be/${top.videoId}`;
+
+      /* 🌐 Fetch audio from API */
+      const apiUrl = `https://mahabub-apis.fun/mahabub/ytmp3?url=${encodeURIComponent(
+        ytUrl
+      )}`;
+
+      const { data } = await axios.get(apiUrl);
+
+      /* ✅ FIXED RESPONSE CHECK */
+      if (data.status !== "success" || !data.audio) {
+        throw new Error("Audio link not found from API");
+      }
+
+      const title = data.title || top.title || "Unknown Title";
+      const audioLink = data.audio;
+
+      /* ✏ Update search message */
+      await api.editMessage(
+        `✅ FOUND: ${title}\n⬇ Downloading...`,
+        searchMsg.messageID
+      );
+
+      /* 📂 File path */
+      const safeName = title.replace(/[^a-zA-Z0-9]/g, "_").slice(0, 30);
+
+      const ext = audioLink.includes(".mp3")
+        ? "mp3"
+        : audioLink.includes(".m4a")
+        ? "m4a"
+        : "mp3";
+
+      const cacheDir = path.join(__dirname, "cache");
+      const filePath = path.join(cacheDir, `${safeName}.${ext}`);
+
+      if (!fs.existsSync(cacheDir)) {
+        fs.mkdirSync(cacheDir, { recursive: true });
+      }
+
+      /* ⬇ Download audio */
+      const file = fs.createWriteStream(filePath);
+      await new Promise((resolve, reject) => {
+        https
+          .get(audioLink, (res) => {
+            if (res.statusCode === 200) {
+              res.pipe(file);
+              file.on("finish", () => file.close(resolve));
+            } else {
+              reject(
+                new Error(`Download failed (status ${res.statusCode})`)
+              );
+            }
+          })
+          .on("error", reject);
+      });
+
+      /* 🎵 Send audio */
+      await api.sendMessage(
+        {
+          body: `🎶 ${title}\n✅ Download complete`,
+          attachment: fs.createReadStream(filePath),
+        },
+        event.threadID,
+        (err) => {
+          if (!err) deleteAfterTimeout(filePath, 10000);
+        },
+        event.messageID
+      );
+
+      /* ✅ Final update */
+      await api.editMessage(`✅ Sent: ${title}`, searchMsg.messageID);
+    } catch (err) {
+      console.error("❌ Song Error:", err.message);
+
+      if (searchMsg?.messageID) {
+        api.editMessage(
+          `❌ Failed: ${err.message}`,
+          searchMsg.messageID
+        );
+      } else {
+        api.sendMessage(
+          `❌ Failed: ${err.message}`,
+          event.threadID,
+          event.messageID
+        );
+      }
+    }
+  },
 };
