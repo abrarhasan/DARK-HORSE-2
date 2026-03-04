@@ -80,7 +80,7 @@ try {
   );
 } catch (err) {
   console.error(err);
-  api.sendMessage(`🥹error, contact MahMUD.`, threadID, messageID);
+  api.sendMessage(`🥹error, contact ABRAR HASAN.`, threadID, messageID);
 }
 
 }
