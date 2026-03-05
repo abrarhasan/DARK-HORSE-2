@@ -1,65 +1,57 @@
 const axios = require("axios");
-const fs = require("fs-extra");
+const fs = require("fs");
 const path = require("path");
-
-const mahmud = async () => {
-  const base = await axios.get("https://raw.githubusercontent.com/mahmudx7/HINATA/main/baseApiUrl.json");
-  return base.data.mahmud;
-};
 
 module.exports = {
   config: {
-    name: "pin",
-    aliases: ["pinterest"],
-    version: "1.7",
-    author: "MahMUD",
-    countDown: 10,
+    name: "pinterest",
+    aliases: ["pin", "pint"],
+    version: "1.0",
+    author: "abrar",
+    countDown: 2,
     role: 0,
-    category: "image gen",
-    guide: { en: "{pn} query - amount\nExample: {pn} goku ultra - 10" }
+    description: "Search Pinterest and get image results",
+    category: "image",
+    guide: {
+      en: "{pn} [keyword] — Get Pinterest image results\nExample: {pn} Naruto"
+    }
   },
 
-  onStart: async function ({ api, event, args, message }) {
-    const obfuscatedAuthor = String.fromCharCode(77, 97, 104, 77, 85, 68);
-    if (module.exports.config.author !== obfuscatedAuthor) {
-      return api.sendMessage(
-        "You are not authorized to change the author name.\n",
-        event.threadID,
-        event.messageID
-      );
-    }
+  onStart: async function ({ api, event, args }) {
+    const query = args.join(" ");
+    if (!query) return api.sendMessage("❗ Please provide a search keyword.\nExample: pinterest Naruto", event.threadID, event.messageID);
 
     try {
-      const queryAndLength = args.join(" ").split("-");
-      const keySearch = queryAndLength[0]?.trim();
-      const count = queryAndLength[1]?.trim();
-      const numberSearch = count ? Math.min(parseInt(count), 20) : 6;
+      const count = 5;
+      const url = `https://betadash-api-swordslush-production.up.railway.app/pinterest?search=${encodeURIComponent(query)}&count=${count}`;
+      const res = await axios.get(url);
 
-      if (!keySearch) return message.reply("❌ | Please enter a search query.\nExample: goku ultra - 10");
-
-      const apiUrl = await mahmud();
-      const response = await axios.get(
-        `${apiUrl}/api/pin?query=${encodeURIComponent(keySearch)}&limit=${numberSearch}`
-      );
-
-      const data = response.data.images;
-      if (!data || data.length === 0) return message.reply("❌ | No images found for your query.");
-
-      const attachments = [];
-      for (let i = 0; i < data.length; i++) {
-        const imgUrl = data[i];
-        const imgRes = await axios.get(imgUrl, { responseType: "arraybuffer" });
-        const imgPath = path.join(__dirname, `temp_pin_${Date.now()}_${i}.jpg`);
-        await fs.outputFile(imgPath, imgRes.data);
-        attachments.push(fs.createReadStream(imgPath));
+      const imageList = res.data?.data;
+      if (!Array.isArray(imageList) || imageList.length === 0) {
+        return api.sendMessage("❌ No results found!", event.threadID, event.messageID);
       }
 
-      await message.reply({ body: `✅ | Here are your ${attachments.length} images for "${keySearch}"`, attachment: attachments });
-      attachments.forEach(att => fs.unlink(att.path, () => {}));
+      const attachments = [];
+
+      for (let i = 0; i < imageList.length; i++) {
+        const imageRes = await axios.get(imageList[i], { responseType: "arraybuffer" });
+        const imagePath = path.join(__dirname, `pin_${i}.jpg`);
+        fs.writeFileSync(imagePath, imageRes.data);
+        attachments.push(fs.createReadStream(imagePath));
+      }
+
+      api.sendMessage({
+        body: `🔍 Pinterest results for: "${query}"`,
+        attachment: attachments
+      }, event.threadID, () => {
+        for (let i = 0; i < attachments.length; i++) {
+          fs.unlinkSync(path.join(__dirname, `pin_${i}.jpg`));
+        }
+      }, event.messageID);
 
     } catch (err) {
       console.error(err);
-      return message.reply(`🥹error, contact MahMUD`);
+      api.sendMessage("🚫 Error fetching from Pinterest API.", event.threadID, event.messageID);
     }
   }
 };
