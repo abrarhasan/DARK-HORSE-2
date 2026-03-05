@@ -4,7 +4,7 @@ const https = require("https");
 
 module.exports = {
   config: {
-    name: "helpall",
+    name: "help",
     aliases: ["menu", "commands"],
     version: "5.0",
     author: "ABRAR",
