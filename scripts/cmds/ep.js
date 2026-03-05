@@ -114,7 +114,7 @@ module.exports = {
     longDescription: "Generate Ephoto effect using text and ID (1–100) or show all available template list",
     category: "10ximg",
     guide: {
-      en: "{pn} <text> - <id>\nExample: {pn} Sifu - 27\n\nView list:\n{pn} list"
+      en: "{pn} <text> - <id>\nExample: {pn} ABRAR - 27\n\nView list:\n{pn} list"
     }
   },
 
