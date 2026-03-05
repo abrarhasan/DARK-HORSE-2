@@ -1,129 +1,115 @@
 const fs = require("fs-extra");
-const axios = require("axios");
 const path = require("path");
-const { getPrefix } = global.utils;
-const { commands, aliases } = global.GoatBot;
-const doNotDelete = "[ 🐐 | GoatBot V2 ]";
+const https = require("https");
 
 module.exports = {
-	config: {
-		name: "helpall",
-		version: "1.17",
-		author: "NTKhang", // orginal author Kshitiz
-		countDown: 5,
-		role: 0,
-		shortDescription: {
-			en: "View command usage and list all commands directly",
-		},
-		longDescription: {
-			en: "View command usage and list all commands directly",
-		},
-		category: "info",
-		guide: {
-			en: "{pn} / help cmdName ",
-		},
-		priority: 1,
-	},
+  config: {
+    name: "helpall",
+    aliases: ["menu", "commands"],
+    version: "5.0",
+    author: "ABRAR",
+    shortDescription: "Show all commands",
+    longDescription: "Show all commands in fancy font with boxes",
+    category: "system",
+    guide: "{pn}help [command name]"
+  },
 
-	onStart: async function ({ message, args, event, threadsData, role }) {
-	const { threadID } = event;
-	const threadData = await threadsData.get(threadID);
-	const prefix = getPrefix(threadID);
+  onStart: async function({ message, args, prefix }) {
+    const allCommands = global.GoatBot.commands;
+    const categories = {};
 
-	if (args.length === 0) {
-			const categories = {};
-			let msg = "";
+    // Command font (𝐀𝐀𝐀𝐀𝐁𝐁 style)
+    const fancyFont = (str) => str.replace(/[A-Za-z]/g, (c) => {
+      const map = {
+        A:"𝐀", B:"𝐁", C:"𝐂", D:"𝐃", E:"𝐄", F:"𝐅", G:"𝐆", H:"𝐇",
+        I:"𝐈", J:"𝐉", K:"𝐊", L:"𝐋", M:"𝐌", N:"𝐍", O:"𝐎", P:"𝐏",
+        Q:"𝐐", R:"𝐑", S:"𝐒", T:"𝐓", U:"𝐔", V:"𝐕", W:"𝐖", X:"𝐗",
+        Y:"𝐘", Z:"𝐙",
+        a:"𝐚", b:"𝐛", c:"𝐜", d:"𝐝", e:"𝐞", f:"𝐟", g:"𝐠", h:"𝐡",
+        i:"𝐢", j:"𝐣", k:"𝐤", l:"𝐥", m:"𝐦", n:"𝐧", o:"𝐨", p:"𝐩",
+        q:"𝐪", r:"𝐫", s:"𝐬", t:"𝐭", u:"𝐮", v:"𝐯", w:"𝐰", x:"𝐱",
+        y:"𝐲", z:"𝐳"
+      };
+      return map[c] || c;
+    });
 
-			msg += `╔══════════════╗\n     ABRAR BOT CMD💐\n╚══════════════╝`;
+    // Category font (𝚂𝚈𝚂𝚃𝙴𝙼 style) for ALL categories
+    const categoryFont = (str) => str.split("").map(c => {
+      const map = {
+        A:"𝙰", B:"𝙱", C:"𝙲", D:"𝙳", E:"𝙴", F:"𝙵", G:"𝙶", H:"𝙷",
+        I:"𝙸", J:"𝙹", K:"𝙺", L:"𝙻", M:"𝙼", N:"𝙽", O:"𝙾", P:"𝙿",
+        Q:"𝚀", R:"𝚁", S:"𝚂", T:"𝚃", U:"𝚄", V:"𝚅", W:"𝚆", X:"𝚇",
+        Y:"𝚈", Z:"𝚉",
+        a:"𝚊", b:"𝚋", c:"𝚌", d:"𝚍", e:"𝚎", f:"𝚏", g:"𝚐", h:"𝚑",
+        i:"𝚒", j:"𝚓", k:"𝚔", l:"𝚕", m:"𝚖", n:"𝚗", o:"𝚘", p:"𝚙",
+        q:"𝚚", r:"𝚛", s:"𝚜", t:"𝚝", u:"𝚞", v:"𝚟", w:"𝚠", x:"𝚡",
+        y:"𝚢", z:"𝚣"
+      };
+      return map[c] || c;
+    }).join("");
 
-			for (const [name, value] of commands) {
-					if (value.config.role > 1 && role < value.config.role) continue;
+    const cleanCategoryName = (text) => text ? text.toLowerCase() : "others";
 
-					const category = value.config.category || "Uncategorized";
-					categories[category] = categories[category] || { commands: [] };
-					categories[category].commands.push(name);
-			}
-8
-			Object.keys(categories).forEach(category => {
-					if (category !== "info") {
-							msg += `\n╭────────────⭓\n│『 ${category.toUpperCase()} 』`;
+    // Categorize commands
+    for (const [name, cmd] of allCommands) {
+      const cat = cleanCategoryName(cmd.config.category);
+      if (!categories[cat]) categories[cat] = [];
+      categories[cat].push(name);
+    }
 
-							const names = categories[category].commands.sort();
-							for (let i = 0; i < names.length; i += 1) {
-									const cmds = names.slice(i, i + 1).map(item => `│🎀${item}🎀`);
-									msg += `\n${cmds.join(" ".repeat(Math.max(0, 5 - cmds.join("").length)))}`;
-							}
+    // Format commands **inside the box**
+    const formatCommandsBox = (cmds) =>
+      cmds.sort().map(c => `│  │ ⎙ ${fancyFont(c)}`).join("\n");
 
-							msg += `\n╰────────⭓`;
-					}
-			});
+    // Build message
+    let msg = `│\n│  ${fancyFont("COMMANDS MENU")}\n│  ───────────────\n`;
+    msg += `│  ${fancyFont("PREFIX")} : ${prefix}\n`;
+    msg += `│  ${fancyFont("TOTAL")}  : ${allCommands.size}\n`;
+    msg += `│  ${fancyFont("AUTHOR")} : ABRAR HASAN\n│\n`;
 
-			const totalCommands = commands.size;
-			msg += `\n𝗖𝘂𝗿𝗿𝗲𝗻𝘁𝗹𝘆, 𝘁𝗵𝗲 𝗯𝗼𝘁 𝗵𝗮𝘀 ${totalCommands} 𝗰𝗼𝗺𝗺𝗮𝗻𝗱𝘀 𝘁𝗵𝗮𝘁 𝗰𝗮𝗻 𝗯𝗲 𝘂𝘀𝗲𝗱\n`;
-			msg += `𝗧𝘆𝗽𝗲 ${prefix} 𝗵𝗲𝗹𝗽 𝗰𝗺𝗱𝗡𝗮𝗺𝗲 𝘁𝗼 𝘃𝗶𝗲𝘄 𝘁𝗵𝗲 𝗱𝗲𝘁𝗮𝗶𝗹𝘀 𝗼𝗳 𝘁𝗵𝗮𝘁 𝗰𝗼𝗺𝗺𝗮𝗻𝗱\n\n`;
-			msg += `YAZKY AI CHATBOT 💐`;
+    for (const cat of Object.keys(categories)) {
+      msg += `│  ┌─ ${categoryFont(cat.toUpperCase())} ─┐\n`;
+      msg += formatCommandsBox(categories[cat]) + "\n";
+      msg += `│  └─────────────┘\n│\n`;
+    }
 
+    msg += `│  𝐔𝐒𝐄 : ${prefix}help <command>\n│`;
 
-			const helpListImages = [
-				"https://i.imgur.com/L5fGnYX.jpeg","https://i.imgur.com/mAifBNb.jpeg","https://i.imgur.com/Lf028tD.jpeg","https://i.imgur.com/CdzNRud.jpeg"
-			];
+    // GIFs array
+    const gifURLs = [
+      "https://i.imgur.com/Xw6JTfn.gif",
+      "https://i.imgur.com/mW0yjZb.gif",
+      "https://i.imgur.com/KQBcxOV.gif"
+    ];
+    const randomGifURL = gifURLs[Math.floor(Math.random() * gifURLs.length)];
+    const gifFolder = path.join(__dirname, "cache");
+    if (!fs.existsSync(gifFolder)) fs.mkdirSync(gifFolder, { recursive: true });
+    const gifName = path.basename(randomGifURL);
+    const gifPath = path.join(gifFolder, gifName);
 
+    if (!fs.existsSync(gifPath)) await downloadGif(randomGifURL, gifPath);
 
-			const helpListImage = helpListImages[Math.floor(Math.random() * helpListImages.length)];
-
-
-			await message.reply({
-					body: msg,
-					attachment: await global.utils.getStreamFromURL(helpListImage)
-			});
-	} else {
-			const commandName = args[0].toLowerCase();
-			const command = commands.get(commandName) || commands.get(aliases.get(commandName));
-
-			if (!command) {
-				await message.reply(`Command "${commandName}" not found.`);
-			} else {
-				const configCommand = command.config;
-				const roleText = roleTextToString(configCommand.role);
-				const author = configCommand.author || "Unknown";
-
-				const longDescription = configCommand.longDescription ? configCommand.longDescription.en || "No description" : "No description";
-
-				const guideBody = configCommand.guide?.en || "No guide available.";
-				const usage = guideBody.replace(/{p}/g, prefix).replace(/{n}/g, configCommand.name);
-
-				const response = `╭── NAME ────⭓
-	│ ${configCommand.name}
-	├── INFO
-	│ Description: ${longDescription}
-	│ Other names: ${configCommand.aliases ? configCommand.aliases.join(", ") : "Do not have"}
-	│ Other names in your group: Do not have
-	│ Version: ${configCommand.version || "1.0"}
-	│ Role: ${roleText}
-	│ Time per command: ${configCommand.countDown || 1}s
-	│ Author: ${author}
-	├── Usage
-	│ ${usage}
-	├── Notes
-	│ The content inside <XXXXX> can be changed
-	│ The content inside [a|b|c] is a or b or c
-	╰━━━━━━━❖`;
-
-				await message.reply(response);
-			}
-		}
-	},
+    return message.reply({
+      body: msg,
+      attachment: fs.createReadStream(gifPath)
+    });
+  }
 };
 
-function roleTextToString(roleText) {
-	switch (roleText) {
-		case 0:
-			return "0 (All users)";
-		case 1:
-			return "1 (Group administrators)";
-		case 2:
-			return "2 (Admin bot)";
-		default:
-			return "Unknown role";
-	}
+// Download GIF function
+function downloadGif(url, dest) {
+  return new Promise((resolve, reject) => {
+    const file = fs.createWriteStream(dest);
+    https.get(url, (res) => {
+      if (res.statusCode !== 200) {
+        fs.unlink(dest, () => {});
+        return reject(new Error(`Failed to download '${url}' (${res.statusCode})`));
+      }
+      res.pipe(file);
+      file.on("finish", () => file.close(resolve));
+    }).on("error", (err) => {
+      fs.unlink(dest, () => {});
+      reject(err);
+    });
+  });
 }
