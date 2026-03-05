@@ -2,8 +2,8 @@ const axios = require("axios");
 
 module.exports = {
   config: {
-    name: "flux",
-    aliases: ["flux", "flux1"],
+    name: "flux2",
+    aliases: ["flux2", "flux1"],
     version: "1.0",
     author: "Neoaz ゐ", //API by RIFAT
     countDown: 10,
