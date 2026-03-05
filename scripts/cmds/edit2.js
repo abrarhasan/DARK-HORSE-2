@@ -4,7 +4,7 @@ const path = require("path");
 
 module.exports = {
   config: {
-    name: "edit",
+    name: "edit2",
     version: "1.0",
     author: "Saimx69x | API Renz",
     countDown: 5,
