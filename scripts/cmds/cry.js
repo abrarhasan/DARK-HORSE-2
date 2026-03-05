@@ -22,7 +22,7 @@ module.exports = {
       noTag: "Bạn phải tag người bạn muốn tát"
     },
     en: {
-      noTag: "You must tag the person you want to cry for"
+      noTag: "You must tag or reply the person you want to cry for"
     }
   },
 
@@ -53,7 +53,7 @@ let avt = await new DIG.Mikkelsen().getImage(url)
       const pathSave = `${__dirname}/tmp/cry.png`;
   fs.writeFileSync(pathSave, Buffer.from(avt));
     let body = "this person always makes me cry"
-    if(!mention[0]) body="Lol you make urself cry\nforgot to reply or mention someone"
+    if(!mention[0]) body="This person makes me cry🥺💔"
     message.reply({body:body,
 attachment: fs.createReadStream(pathSave)
     }, () => fs.unlinkSync(pathSave));
