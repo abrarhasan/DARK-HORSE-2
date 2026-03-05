@@ -54,8 +54,8 @@ function findCommand(name) {
 
 module.exports = {
   config: {
-    name: "help",
-    aliases: ["menu"],
+    name: "helpall",
+    aliases: ["menuall"],
     version: "2.0",
     author: "Saimx69x | fixed by Aphelion",
     role: 0,
