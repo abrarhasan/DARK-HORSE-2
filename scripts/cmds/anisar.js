@@ -20,7 +20,7 @@ module.exports = {
     name: "anisr",
     aliases: ["animesr"],
     version: "1.7",
-    author: "MahMUD",
+    author: "abrar",
     countDown: 10,
     role: 0,
     category: "anime",
@@ -80,7 +80,7 @@ module.exports = {
     } catch (error) {
       console.error(error);
       api.sendMessage(
-        "🥹error, contact MahMUD",
+        "🥹error, contact abrar",
         event.threadID,
         event.messageID
       );
