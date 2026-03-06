@@ -1,61 +1,57 @@
-const axios = require('axios');
-const fs = require('fs');
-const path = require('path');
+const fs = require("fs-extra");
+const request = require("request");
+const path = require("path");
 
 module.exports = {
-config: {
-  name: "ownerinfo",
-  aurthor:"abrar",// Convert By Goatbot Tokodori 
-   role: 0,
-  shortDescription: " ",
-  longDescription: "",
-  category: "OWNER",
-  guide: "{pn}"
-},
+  config: {
+    name: "ownerinfo",
+    version: "1.3.0",
+    author: "abrar",
+    role: 0,
+    shortDescription: "Owner information with image",
+    category: "Information",
+    guide: {
+      en: "owner"
+    }
+  },
 
   onStart: async function ({ api, event }) {
-  try {
-    const ownerInfo = {
-      name: '🌻Abrar Hasan🌻',
-      gender: 'Male',
-      age: '22',
-      height: 'Unknown',
-      nick: 'Good boy🤭',
-      facebookLink: 'https://www.facebook.com/abrar.hasan.125760550'
-      '
+    const ownerText = 
+`╭─ 👑 Oᴡɴᴇʀ Iɴғᴏ 👑 ─╮
+│ 👤 Nᴀᴍᴇ       : ABRAR HASAN
+│ 🧸 Nɪᴄᴋ       : ༄ꨄ︎G҈𝐨𝐨𝐝𝐛𝐨𝐲≛⃝💜࿐
+│ 🎂 Aɢᴇ        : 20+
+│ 💘 Rᴇʟᴀᴛɪᴏɴ : Sɪɴɢʟᴇ
+│ 🎓 Pʀᴏғᴇssɪᴏɴ : Sᴛᴜᴅᴇɴᴛ
+│ 📚 Eᴅᴜᴄᴀᴛɪᴏɴ : Hons
+│ 🏡 Nationality : Bangladeshi
+├─ 🔗 Cᴏɴᴛᴀᴄᴛ ─╮
+│ 📘 Facebook  : https://www.facebook.com/abrar.hasan.125760550 
+│ 💬 Messenger: https://m.me/abrar.hasan.125760550
+│ 📞 WhatsApp  : wa.me/018............
+╰────────────────╯`;
+
+    const cacheDir = path.join(__dirname, "cache");
+    const imgPath = path.join(cacheDir, "owner.jpg");
+
+    if (!fs.existsSync(cacheDir)) fs.mkdirSync(cacheDir);
+
+    const imgLink = "https://i.imgur.com/L5fGnYX.jpeg";
+
+    const send = () => {
+      api.sendMessage(
+        {
+          body: ownerText,
+          attachment: fs.createReadStream(imgPath)
+        },
+        event.threadID,
+        () => fs.unlinkSync(imgPath),
+        event.messageID
+      );
     };
 
-    const bold = 'https://i.ibb.co/xqNbSRhr/image0.jpg'; // Replace with your Google Drive videoid link https://drive.google.com/uc?export=download&id=here put your video id
-
-    const tmpFolderPath = path.join(__dirname, 'tmp');
-
-    if (!fs.existsSync(tmpFolderPath)) {
-      fs.mkdirSync(tmpFolderPath);
-    }
-
-    const videoResponse = await axios.get(bold, { responseType: 'arraybuffer' });
-    const videoPath = path.join(tmpFolderPath, 'owner_image.jph');
-
-    fs.writeFileSync(videoPath, Buffer.from(videoResponse.data, 'binary'));
-
-    const response = `
-🌺🌺🌺Owner Information🌺🌺🌺\n👉🏻
-Name: ${ownerInfo.name}\n👉🏻Gender: ${ownerInfo.gender}\n👉🏻
-Age: ${ownerInfo.age}\n👉🏻Height: ${ownerInfo.height}\n👉🏻Nick: ${ownerInfo.nick}\n👉🏻Facebook: ${ownerInfo.facebookLink}
-\n\n________&&&&&&&________`;
-
-
-    await api.sendMessage({
-      body: response,
-      attachment: fs.createReadStream(videoPath)
-    }, event.threadID, event.messageID);
-
-    if (event.body.toLowerCase().includes('ownerinfo')) {
-      api.setMessageReaction('🚀', event.messageID, (err) => {}, true);
-    }
-  } catch (error) {
-    console.error('Error in ownerinfo command:', error);
-    return api.sendMessage('An error occurred while processing the command.', event.threadID);
+    request(encodeURI(imgLink))
+      .pipe(fs.createWriteStream(imgPath))
+      .on("close", send);
   }
-},
 };
