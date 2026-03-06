@@ -26,7 +26,7 @@ module.exports = {
     const userID = event.senderID;
     let query = encodeURIComponent(args.join(" "));
     if (!query) {
-      message.reply("Please provide a query. \n\nExample: /pi hey buddy ");
+      message.reply("Please provide a query. \n\nExample: +hey buddy ");
       return;
     }
 
