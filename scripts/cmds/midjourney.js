@@ -40,7 +40,7 @@ module.exports = {
     name: "midjourney",
     version: "1.6.9",
     aliases: ["mj"],
-    author: "Nazrul",
+    author: "abrar",
     countDown: 20,
     role: 0,
     isPremium: true,
