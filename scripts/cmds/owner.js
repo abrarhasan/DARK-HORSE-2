@@ -1,7 +1,58 @@
-const fs = require('fs'); 
-const moment = require('moment-timezone'); 
-module.exports = { config: { name: "owner", version: "1.0", countDown: 20, role: 0, shortDescription: { vi: "", en: "" }, longDescription: { vi: "", en: "" }, category: "owner", guide: { en: "" }, envConfig: {} }, 
-               onStart: async function ({ message }) { const botName = "🌻💜𝕬𝖇𝖗𝖆𝖗'𝖘 𝕮𝖚𝖙𝖎𝖊💜🌻"; const botPrefix = "+"; const authorName = "🌻ABRAR HASAN🌻"; const ownAge = "22🙈"; const teamName = "Dark-Horse"; const authorFB = "https://www.facebook.com/abrar.hasan.125760550"; const authorInsta = "Unknown"; const tikTok = "Unknown "; const urls = JSON.parse(fs.readFileSync('cliff.json')); const link = urls[Math.floor(Math.random() * urls.length)]; const now = moment().tz('Asia/Dhaka'); const date = now.format('MMMM Do YYYY'); const time = now.format('h:mm:ss A'); const uptime = process.uptime(); const seconds = Math.floor(uptime % 60); const minutes = Math.floor((uptime / 60) % 60); const hours = Math.floor((uptime / (60 * 60)) % 24); const days = Math.floor(uptime / (60 * 60 * 24)); const uptimeString = `${days} days ${hours} hours ${minutes} minutes ${seconds} seconds`; message.reply({ body: `🌺🌺《  Bot & Owner Info 》🌺🌺
-\n\n👉🏻Name: ${botName}\n👉🏻Bot Prefix: ${botPrefix}\n👉🏻owner: ${authorName}\n👉🏻age : ${ownAge}\n👉🏻Facebook: ${authorFB}
-\n\n👉🏻Instagram: ${authorInsta}\n👉🏻TikTok: ${tikTok}\n👉🏻Date: ${date}\n👉🏻Time: ${time}\n👉🏻Team: ${teamName}\n👉🏻Uptime: ${uptimeString}
-\n\n=======&&&&&&&========`, attachment: await global.utils.getStreamFromURL(link) }) }, onChat: async function({ event, message, getLang }) { if (event.body && event.body.toLowerCase() === "info") { this.onStart({ message }); } } };
+const fs = require("fs-extra");
+const request = require("request");
+const path = require("path");
+
+module.exports = {
+  config: {
+    name: "owner",
+    version: "1.3.0",
+    author: "abrar",
+    role: 0,
+    shortDescription: "Owner information with image",
+    category: "Information",
+    guide: {
+      en: "owner"
+    }
+  },
+
+  onStart: async function ({ api, event }) {
+    const ownerText = 
+`╭─ 👑 Oᴡɴᴇʀ Iɴғᴏ 👑 ─╮
+│ 👤 Nᴀᴍᴇ       : ABRAR HASAN
+│ 🧸 Nɪᴄᴋ       : ༄ꨄ︎G҈𝐨𝐨𝐝𝐛𝐨𝐲≛⃝💜࿐
+│ 🎂 Aɢᴇ        : 20+
+│ 💘 Rᴇʟᴀᴛɪᴏɴ : Sɪɴɢʟᴇ
+│ 🎓 Pʀᴏғᴇssɪᴏɴ : Sᴛᴜᴅᴇɴᴛ
+│ 📚 Eᴅᴜᴄᴀᴛɪᴏɴ : Hons
+│ 🏡 Nationality : Bangladeshi
+├─ 🔗 Cᴏɴᴛᴀᴄᴛ ─╮
+│ 📘 Facebook  : https://www.facebook.com/abrar.hasan.125760550 
+│ 💬 Messenger: https://m.me/abrar.hasan.125760550
+│ 📞 WhatsApp  : wa.me/018............
+╰────────────────╯`;
+
+    const cacheDir = path.join(__dirname, "cache");
+    const imgPath = path.join(cacheDir, "owner.jpg");
+
+    if (!fs.existsSync(cacheDir)) fs.mkdirSync(cacheDir);
+
+    const imgLink = "https://i.imgur.com/mAifBNb.jpeg";
+
+    const send = () => {
+      api.sendMessage(
+        {
+          body: ownerText,
+          attachment: fs.createReadStream(imgPath)
+        },
+        event.threadID,
+        () => fs.unlinkSync(imgPath),
+        event.messageID
+      );
+    };
+
+    request(encodeURI(imgLink))
+      .pipe(fs.createWriteStream(imgPath))
+      .on("close", send);
+  }
+};
+
