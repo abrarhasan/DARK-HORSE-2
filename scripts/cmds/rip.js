@@ -1,58 +1,66 @@
-const axios = require("axios");
+const Canvas = require("canvas");
 const fs = require("fs");
 const path = require("path");
 
-const baseApiUrl = async () => {
-  const base = await axios.get(
-    "https://raw.githubusercontent.com/mahmudx7/HINATA/main/baseApiUrl.json"
-  );
-  return base.data.mahmud;
-};
-
-/**
-* @author MahMUD
-* @author: do not delete it
-*/
+// 🔑 Facebook App Token
+const FB_TOKEN = "6628568379|c1e620fa708a1d5696fb991c1bde5662";
 
 module.exports = {
   config: {
     name: "rip",
-    aliases: [],
-    version: "1.7",
-    author: "MahMUD",
+    version: "1.0",
+    author: "Abrar",
     role: 0,
     category: "fun",
-    cooldown: 10,
-    guide: "rip [mention-reply-UID]",
+    guide: "{pn} @mention / reply"
   },
 
-  onStart: async function ({ api, event, args }) {
-     const obfuscatedAuthor = String.fromCharCode(77, 97, 104, 77, 85, 68);
-     if (module.exports.config.author !== obfuscatedAuthor) {
-     return api.sendMessage(
-     "You are not authorized to change the author name.", event.threadID, event.messageID );
-   }
+  onStart: async function ({ api, event, message }) {
+    try {
+      const mention = Object.keys(event.mentions);
+      const replyID = event.messageReply?.senderID;
 
-    const { threadID, messageID, messageReply, mentions } = event;
-    let id2; if (messageReply) { id2 = messageReply.senderID; } else if (Object.keys(mentions).length > 0) {
-    id2 = Object.keys(mentions)[0];  } else if (args[0]) {  id2 = args[0]; } else {
-    return api.sendMessage( "baby, Mention, reply, or provide UID of the target.", threadID, messageID );
-  }
+      // target user (mention > reply > self)
+      const targetID = mention[0] || replyID || event.senderID;
 
-   try {
-    const url = `${await baseApiUrl()}/api/dig?type=rip&user=${id2}`;
-    const response = await axios.get(url, { responseType: "arraybuffer" });
-    const filePath = path.join(__dirname, `rip_${id2}.png`);
-    fs.writeFileSync(filePath, response.data);
+      // Facebook Graph avatar
+      const avatarURL =
+        `https://graph.facebook.com/${targetID}/picture?width=720&height=720&access_token=${FB_TOKEN}`;
 
-     
-    api.sendMessage({ attachment: fs.createReadStream(filePath),
-    body: ` rip  🐸`,
-     },
-    threadID, () => fs.unlinkSync(filePath),  messageID );
-  } catch (err) {
-    console.error(err);
-    api.sendMessage(`🥹error, contact MahMUD.`, threadID, messageID);
+      // Canvas setup (same as class)
+      const canvas = Canvas.createCanvas(720, 405);
+      const ctx = canvas.getContext("2d");
+
+      // Load images
+      const avatar = await Canvas.loadImage(avatarURL);
+      const background = await Canvas.loadImage(
+        "https://raw.githubusercontent.com/Arafat-Core/Arafat-Temp/refs/heads/main/rip.png"
+      );
+
+      // Draw avatar first (exact position)
+      ctx.drawImage(avatar, 110, 47, 85, 85);
+
+      // Draw RIP overlay
+      ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
+
+      // Save
+      const cacheDir = path.join(__dirname, "cache");
+      if (!fs.existsSync(cacheDir)) fs.mkdirSync(cacheDir);
+
+      const imgPath = path.join(cacheDir, `rip_${targetID}.png`);
+      fs.writeFileSync(imgPath, canvas.toBuffer());
+
+      message.reply(
+        {
+          body: "🪦 RIP moment.",
+          attachment: fs.createReadStream(imgPath)
+        },
+        () => fs.unlinkSync(imgPath)
+      );
+
+    } catch (err) {
+      console.error("RIP CMD ERROR:", err);
+      message.reply("❌ Failed to generate image.");
     }
-  },
+  }
 };
