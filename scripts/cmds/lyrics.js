@@ -1,53 +1,72 @@
-const axios = require("axios");
+const { GoatWrapper } = require('fca-liane-utils');
+const axios = require('axios');
 
-const baseApiUrl = async () => {
-  const base = await axios.get(
-    `https://raw.githubusercontent.com/Mostakim0978/D1PT0/refs/heads/main/baseApiUrl.json`,
-  );
-  return base.data.api;
-};
+async function getStreamFromURL(url) {
+  const response = await axios.get(url, { responseType: 'stream' });
+  return response.data;
+}
 
-(module.exports = {
+async function fetchLyricsVideos(query) {
+  try {
+    const response = await axios.get(`https://short-video-api-by-arafat.vercel.app/arafat?keyword=${encodeURIComponent(query + " lyrics video")}`);
+    return response.data;
+  } catch (error) {
+    console.error("API Error:", error);
+    return null;
+  }
+}
+
+module.exports = {
   config: {
     name: "lyrics",
+    aliases: ["lrvideo"],
+    author: "𝗔brar",
     version: "1.0",
-    author: "Nazrul",
-    countDown: 5,
-    role: 0,
-    description: {
-      en: "Get song lyrics with their Images"
+    shortDescription: {
+      en: "get lyrics video",
     },
-    category: "Song Lyrics",
+    longDescription: {
+      en: "search for songs' lyrics videos",
+    },
+    category: "𝗠𝗘𝗗𝗜𝗔",
     guide: {
-      en: "{pn} <song name>"
-    }
+      en: "{p}{n} [song name]",
+    },
   },
 
-  onStart: async ({ api, event, args }) => {
-    try {
-      const Songs = args.join(' ');
-      if (!Songs) {
-        return api.sendMessage("Please provide a song name!", event.threadID, event.messageID);
-      }
-
-      const res = await axios.get(`${await baseApiUrl()}/lyrics2?songName=${encodeURIComponent(Songs)}`);
-      const data = res.data;
-      if (!data.title || !data.artist || !data.lyrics) {
-        return api.sendMessage("An error occurred while fetching lyrics!", event.threadID, event.messageID);
-      }
-
-      const songMessage = { 
-        body: `❏♡𝐒𝐨𝐧𝐠 𝐓𝐢𝐭𝐥𝐞: ${data.title}\n\n❏♡𝐀𝐫𝐭𝐢𝐬𝐭: ${data.artist}\n\n❏♡𝐒𝐨𝐧𝐠 𝐋𝐲𝐫𝐢𝐜𝐬:\n\n${data.lyrics}` 
-      };
-      
-      if (data.image) {
-        const stream = await axios.get(data.image, { responseType: 'stream' });
-        songMessage.attachment = stream.data;
-      }
-
-      return api.sendMessage(songMessage, event.threadID, event.messageID);
-    } catch (error) {
-    api.sendMessage("error: " + error.message, event.threadID, event.messageID);
+  onStart: async function ({ api, event, args }) {
+    const query = args.join(' ');
+    if (!query) {
+      return api.sendMessage("#𝐥𝐫𝐯𝐢𝐝𝐞𝐨 𝐒𝐨𝐧𝐠 𝐧𝐚𝐦𝐞", event.threadID, event.messageID);
     }
-  }
-});
+
+    api.setMessageReaction("🦋", event.messageID, () => {}, true);
+    
+    const videos = await fetchLyricsVideos(query);
+
+    if (!Array.isArray(videos) || videos.length === 0) {
+      return api.sendMessage(`"${query}" 𝐍𝐨𝐭 𝐅𝐨𝐮𝐧𝐝`, event.threadID, event.messageID);
+    }
+
+    const selectedVideo = videos[Math.floor(Math.random() * videos.length)];
+    const videoUrl = selectedVideo.videoUrl;
+
+    if (!videoUrl) {
+      return api.sendMessage("𝐍𝐨 𝐥𝐲𝐫𝐢𝐜𝐬 𝐕𝐢𝐝𝐞𝐨 𝐅𝐨𝐮𝐧𝐝", event.threadID, event.messageID);
+    }
+
+    try {
+      const videoStream = await getStreamFromURL(videoUrl);
+      await api.sendMessage({
+        body: `𝐋𝐲𝐫𝐢𝐜𝐬: ${query}`,
+        attachment: videoStream,
+      }, event.threadID, event.messageID);
+    } catch (error) {
+      console.error(error);
+      api.sendMessage("𝐄𝐫𝐫𝐨𝐫 𝐁𝐚𝐛𝐲 🥺", event.threadID, event.messageID);
+    }
+  },
+};
+
+const wrapper = new GoatWrapper(module.exports);
+wrapper.applyNoPrefix({ allowPrefix: true });
