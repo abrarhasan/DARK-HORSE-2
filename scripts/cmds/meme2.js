@@ -35,7 +35,7 @@ async function getName(api, uid) {
 
 module.exports = {
   config: {
-    name: "meme",
+    name: "meme2",
     aliases: ["meme"],
     version: "25.0",
     author: "Abrar",
