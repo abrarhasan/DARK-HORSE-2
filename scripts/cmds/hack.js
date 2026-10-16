@@ -6,14 +6,14 @@ module.exports = {
   config: {
     name: "hack",
     version: "1.0.0",
-    author: "Abrar (Dark horse team)",
+    author: "Abrar (Converted by Abrar)",
     countDown: 0,
     role: 0,
     shortDescription: "Fake FB hack generator 😅",
     longDescription: "Creates a fake hacking style image using target profile photo and name.",
     category: "fun",
     guide: {
-      en: "{pn} @mention or reply the one whom uh want me to hack"
+      en: "{pn} @mention বা reply দিয়ে ব্যবহার করো"
     }
   },
 
@@ -104,7 +104,7 @@ module.exports = {
       fs.writeFileSync(bgPath, finalBuffer);
 
       await message.reply({
-        body: "😎 Successfully hacked by ABRAR BOT! Check ur account settings",
+        body: "😎 হ্যাক সম্পূর্ণ!",
         attachment: fs.createReadStream(bgPath)
       });
 
@@ -113,8 +113,7 @@ module.exports = {
       fs.unlinkSync(avatarPath);
     } catch (err) {
       console.error(err);
-      message.reply("❌ েSomething went wrong!");
+      message.reply("❌ কিছু ভুল হয়েছে!");
     }
   }
 };
-
